@@ -29,13 +29,13 @@ const ContactSequence = ({ onClose }) => {
 
     // Step 1: Initial Logs
     initLogs.forEach((line) => {
-      delay += 400;
+      delay += 150;
       setTimeout(() => setLog((prev) => [...prev, line]), delay);
     });
 
     // Step 2: Location Hopping
     locations.forEach((loc, i) => {
-      delay += 800; // Time between hops
+      delay += 300; // Time between hops
       setTimeout(() => {
         setCurrentLocation(loc);
         setLog((prev) => [...prev, `Tracking signal... ${loc}`]);
@@ -53,8 +53,8 @@ const ContactSequence = ({ onClose }) => {
       setStep(2); // Success visual
       setTimeout(() => {
         onClose(); // Trigger unlock in parent
-      }, 1500);
-    }, delay + 1500);
+      }, 800);
+    }, delay + 800);
   }, [onClose]);
 
   return (

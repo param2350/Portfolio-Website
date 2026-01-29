@@ -31,6 +31,10 @@ export const SKILLS = [
   { name: 'Git', group: 3, color: 'text-orange-500', slug: 'git' },
   { name: 'Grafana', group: 3, color: 'text-orange-400', slug: 'grafana' },
   { name: 'n8n', group: 3, color: 'text-red-500', slug: 'n8n' },
+  { name: 'AWS', group: 3, color: 'text-orange-500', icon: 'AWS' },
+  { name: 'GTM', group: 3, color: 'text-blue-500', slug: 'googletagmanager' },
+  { name: 'Adobe Analytics', group: 3, color: 'text-red-600', icon: 'AA' },
+  { name: 'Mixpanel', group: 3, color: 'text-purple-600', slug: 'mixpanel' },
 ];
 
 // 3D Math Constants

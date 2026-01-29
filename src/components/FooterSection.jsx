@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Lock, Mail, Github, Linkedin } from 'lucide-react';
 
 // --- Footer Contact Section - Locked until Contact Me is clicked ---
-const FooterSection = ({ triggerUnlock }) => {
+const FooterSection = ({ triggerUnlock, onLockedClick }) => {
   const [phase, setPhase] = useState('locked'); // locked -> unlocking -> revealed
   const footerRef = useRef(null);
 
@@ -37,7 +37,8 @@ const FooterSection = ({ triggerUnlock }) => {
 
       {/* Locked State - Visible until Contact Me is clicked */}
       <div
-        className={`absolute inset-0 flex flex-col items-center justify-center z-20 transition-all duration-700 ${phase === 'locked' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onLockedClick}
+        className={`absolute inset-0 flex flex-col items-center justify-center z-20 transition-all duration-700 cursor-pointer ${phase === 'locked' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
       >
         <div className="flex items-center gap-3 px-8 py-4 bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-700 mb-6">
           <Lock size={24} className="text-cyan-400" />
@@ -67,10 +68,9 @@ const FooterSection = ({ triggerUnlock }) => {
       {/* Main Content - Expands from center */}
       <div
         className={`max-w-4xl mx-auto px-6 text-center relative z-10 transition-all duration-1000 ease-out
-          ${
-            isRevealed
-              ? 'opacity-100 blur-0 scale-100'
-              : 'opacity-0 blur-lg scale-y-0'
+          ${isRevealed
+            ? 'opacity-100 blur-0 scale-100'
+            : 'opacity-0 blur-lg scale-y-0'
           }`}
         style={{ transformOrigin: 'center center' }}
       >

@@ -5,7 +5,6 @@ import {
   BarChart3,
   AlertTriangle,
   Link,
-  Globe,
 } from 'lucide-react';
 
 export const PROJECTS = [
@@ -15,8 +14,8 @@ export const PROJECTS = [
     subtitle:
       'An internal, on-device WebView debugging tool built to solve the black-box nature of mobile WebViews.',
     description:
-      'Exposes a DevTools-like interface directly within the app, enabling engineers and QA to debug issues on production hardware without cables.',
-    tags: ['Best Innovation Idea'],
+      "A breakthrough internal tool built for AngelOne to solve the 'Black Box' problem of mobile WebViews. Traditionally, debugging issues inside a WebView required tethering devices to a laptop (USB debugging), which was impossible for field issues or non-dev devices. TWA Lens injects a powerful DevTools suite directly into the app, allowing developers and QA engineers to inspect network traffic, view console logs, and even tweak CSS on the fly—all without a single cable.",
+    tags: ['AngelOne', 'Internal Tool', 'Mobile-First'],
     color: 'text-cyan-400',
     gradient: 'from-cyan-500/10 to-blue-500/10',
     features: [
@@ -44,10 +43,6 @@ export const PROJECTS = [
         icon: BarChart3,
         color: 'text-amber-400',
       },
-    ],
-    stats: [
-      { label: 'Critical Vulns Patched', value: '10+' },
-      { label: 'Adoption', value: '100% QA' },
     ],
   },
   {
@@ -79,16 +74,6 @@ export const PROJECTS = [
         icon: Activity,
         color: 'text-green-400',
       },
-      {
-        title: 'Env Switcher',
-        desc: 'Toggle between Prod/Stage/Dev.',
-        icon: Globe,
-        color: 'text-purple-400',
-      },
-    ],
-    stats: [
-      { label: 'Users', value: '50+' },
-      { label: 'Time Saved', value: '2hrs/day' },
     ],
   },
 ];

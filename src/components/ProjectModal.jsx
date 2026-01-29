@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
+import MobileSimulator from './MobileSimulator';
 
 const ProjectModal = ({ project, onClose }) => {
   useEffect(() => {
@@ -65,9 +66,18 @@ const ProjectModal = ({ project, onClose }) => {
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4">
               Overview
             </h3>
-            <p className="text-slate-400 leading-relaxed text-lg">
-              {project.description}
-            </p>
+            <div className="flex flex-col lg:flex-row gap-8 items-start">
+              <p className="text-slate-400 leading-relaxed text-lg flex-1">
+                {project.description}
+              </p>
+              {project.id === 'twa-lens' && (
+                <div className="w-full lg:w-auto flex justify-center lg:block">
+                  <div className="transform scale-75 md:scale-90 origin-top">
+                    <MobileSimulator />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Features Grid */}

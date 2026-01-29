@@ -10,7 +10,7 @@ const PHRASES = [
 ];
 
 // --- Hanging Monkey Mascot (Enhanced: Evasive + Intro + Guide) ---
-const HangingMonkey = ({ onClick, isFooterLocked }) => {
+const HangingMonkey = ({ onClick, isFooterLocked, forceMessage }) => {
   const [isVisible, setIsVisible] = useState(false); // Start hidden for slide-in
   const [side, setSide] = useState('right');
   const [eyePos, setEyePos] = useState({ x: 0, y: 0 });
@@ -57,19 +57,15 @@ const HangingMonkey = ({ onClick, isFooterLocked }) => {
     }, 600);
   }, []);
 
-  // Lifecycle & Scroll Trigger (Simple Intro + Guide)
+  // 1. Initial Visibility (No speech)
   useEffect(() => {
-    // 1. Sliding Intro Sequence
-    const introTimer = setTimeout(() => {
-      setIsVisible(true); // Trigger slide down from top
-      setSpeech('Hello World!');
+    // Small delay to ensure render layout is ready before animating in
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
-      setTimeout(() => {
-        setSpeech('');
-      }, 2000);
-    }, 500);
-
-    // 2. Scroll Listener
+  // 2. Scroll Listener
+  useEffect(() => {
     const handleScroll = () => {
       // Guide Logic: At bottom (-100px buffer) + Locked
       // Use documentElement.scrollHeight for reliable total height
@@ -77,67 +73,93 @@ const HangingMonkey = ({ onClick, isFooterLocked }) => {
       const scrollBottom = window.innerHeight + window.scrollY;
       const atBottom = scrollBottom >= totalHeight - 100;
 
-      if (atBottom) {
+      if (forceMessage) {
+        setSpeech(forceMessage);
+        setIsVisible(true);
+      } else if (atBottom) {
         if (isFooterLocked) setSpeech('Go UP to Contact Me!');
       } else if (lifecycle === 'docked' && !isHovered && !isFleeing) {
-        if (speech === 'Go UP to Contact Me!') setSpeech('');
+        // Only clear if we are NOT showing a forced message
+        if (speech === 'Go UP to Contact Me!' && !forceMessage) setSpeech('');
       }
     };
+
+    // Immediate update if forceMessage changes
+    if (forceMessage) {
+      setSpeech(forceMessage);
+      setIsVisible(true);
+    } else if (speech === 'System Override!' || speech === 'Access Denied!') {
+      // Clear forced messages immediately when they are removed
+      setSpeech('');
+    }
+
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      clearTimeout(introTimer);
     };
-  }, [lifecycle, isFleeing, isFooterLocked, isHovered, speech]);
+  }, [lifecycle, isFleeing, isFooterLocked, isHovered, speech, forceMessage]);
 
   // AI Core: Tracking & Logic
   useEffect(() => {
+    let animationFrameId;
+    let lastRun = 0;
+
     const handleMouseMove = (e) => {
       if (!headRef.current || !isVisible || isFleeing) return;
 
-      const rect = headRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+      const now = Date.now();
+      // Throttle: Only run every 200ms
+      if (now - lastRun < 200) return;
+      lastRun = now;
 
-      const dx = e.clientX - centerX;
-      const dy = e.clientY - centerY;
-      const dist = Math.hypot(dx, dy);
+      // cancel any pending frame to ensure we only run the latest
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-      // 1. Eye Tracking
-      const angle = Math.atan2(dy, dx);
-      const eyeDist = Math.min(3, dist / 20);
-      setEyePos({ x: Math.cos(angle) * eyeDist, y: Math.sin(angle) * eyeDist });
+      animationFrameId = requestAnimationFrame(() => {
+        const rect = headRef.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
 
-      // 2. Danger Sensing (Proximity)
-      // Range: Starts getting mad at 400px, Full mad at 150px
-      const safeZone = 400;
-      const criticalZone = 150;
-      let level = 0;
+        const dx = e.clientX - centerX;
+        const dy = e.clientY - centerY;
+        const dist = Math.hypot(dx, dy);
 
-      if (dist < safeZone) {
-        level =
-          1 - Math.max(0, (dist - criticalZone) / (safeZone - criticalZone));
-      }
-      setDangerLevel(level);
+        // 1. Eye Tracking
+        const angle = Math.atan2(dy, dx);
+        const eyeDist = Math.min(3, dist / 20);
+        setEyePos({ x: Math.cos(angle) * eyeDist, y: Math.sin(angle) * eyeDist });
 
-      // 3. Evasion Trigger
-      if (dist < criticalZone && !isHovered) {
-        triggerEvasion();
-      }
+        // 2. Danger Sensing (Proximity)
+        const safeZone = 400;
+        const criticalZone = 150;
+        let level = 0;
+
+        if (dist < safeZone) {
+          level = 1 - Math.max(0, (dist - criticalZone) / (safeZone - criticalZone));
+        }
+        setDangerLevel(level);
+
+        // 3. Evasion Trigger
+        if (dist < criticalZone && !isHovered) {
+          triggerEvasion();
+        }
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
   }, [isVisible, isFleeing, side, isHovered, triggerEvasion]);
 
   // Handlers
   const handleMouseEnter = () => {
     setIsHovered(true);
-    setSpeech('System Override!');
+    if (!forceMessage) setSpeech('System Override!');
   };
   const handleClick = () => {
-    setSpeech('Accessing Mainframe...');
-    setTimeout(onClick, 500);
+    onClick();
   };
 
   // Dynamic Styles
@@ -173,7 +195,7 @@ const HangingMonkey = ({ onClick, isFooterLocked }) => {
 
   return (
     <div
-      className={`fixed transition-all duration-1000 cubic-bezier(0.175, 0.885, 0.32, 1.275)`}
+      className={`fixed z-[60] transition-all duration-1000 cubic-bezier(0.175, 0.885, 0.32, 1.275)`}
       style={getContainerStyle()}
     >
       <div
@@ -187,7 +209,7 @@ const HangingMonkey = ({ onClick, isFooterLocked }) => {
           className={`absolute top-10 w-40 bg-white text-slate-900 text-xs font-bold p-3 rounded-xl 
             ${side === 'right' ? '-left-44 rounded-tr-none' : '-right-44 rounded-tl-none'}
             shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300 transform 
-            ${isHovered || isFleeing ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}`}
+            ${isHovered || isFleeing || speech ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}`}
         >
           {speech}
         </div>

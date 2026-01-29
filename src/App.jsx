@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
+  TrendingUp,
+  ShoppingBag,
+  Clock,
   Cpu,
   Zap,
   Shield,
@@ -23,6 +26,7 @@ import HangingMonkey from './components/HangingMonkey';
 import HeroParticles from './components/HeroParticles';
 import TechStackDisplay from './components/TechStackDisplay';
 import ContactSequence from './components/ContactSequence';
+import WelcomeScreen from './components/WelcomeScreen';
 
 import FooterSection from './components/FooterSection';
 import ExperienceCard from './components/ExperienceCard';
@@ -145,6 +149,7 @@ const ArticleCard = ({ title, link, icon: Icon }) => (
 // --- Main App ---
 
 export default function Portfolio() {
+  const [showWelcome, setShowWelcome] = useState(true);
   const [devMode, setDevMode] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
@@ -153,6 +158,7 @@ export default function Portfolio() {
 
   const [wasUnlockedViaButton, setWasUnlockedViaButton] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [monkeyMessage, setMonkeyMessage] = useState('');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -185,6 +191,7 @@ export default function Portfolio() {
       return;
     }
     // Start the overlay sequence
+    setMonkeyMessage(''); // Clear any denial messages
     setShowContactSequence(true);
   };
 
@@ -198,10 +205,22 @@ export default function Portfolio() {
     }, 100);
   };
 
+  const handleLockedInteraction = (message) => {
+    // If we are already running the sequence, don't show error messages
+    if (showContactSequence) return;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMonkeyMessage(message);
+    setTimeout(() => setMonkeyMessage(''), 5000);
+  };
+
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${devMode ? 'bg-[#0a0a0a] font-mono selection:bg-purple-500/30' : 'bg-slate-950 font-sans selection:bg-cyan-500/30'} text-slate-200`}
     >
+      {/* Welcome Screen Overlay */}
+      {showWelcome && <WelcomeScreen onComplete={() => setShowWelcome(false)} />}
+
       {/* Unlock Animation Overlay (Global) */}
       {showContactSequence && <ContactSequence onClose={onSequenceComplete} />}
 
@@ -221,6 +240,7 @@ export default function Portfolio() {
       <HangingMonkey
         onClick={handleUnlockSequence}
         isFooterLocked={isFooterLocked}
+        forceMessage={monkeyMessage}
       />
 
       {/* Navigation */}
@@ -228,7 +248,9 @@ export default function Portfolio() {
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled || devMode ? 'bg-slate-950/90 backdrop-blur-md border-b border-slate-800' : 'bg-transparent'}`}
       >
         <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tighter text-white">
+          <div
+            className={`flex items-center gap-2 font-bold text-xl tracking-tighter text-white transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0'}`}
+          >
             {devMode ? (
               <Terminal className="text-green-500" size={20} />
             ) : (
@@ -298,29 +320,23 @@ export default function Portfolio() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full relative z-10 pointer-events-none">
               {/* 1. Main Intro Card (2x2) - Now Transparent/Glassy to show points */}
-              <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 pointer-events-auto p-8 flex flex-col justify-center text-left">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="relative">
-                    <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse absolute inset-0"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  </div>
-                  <span className="text-xs font-mono text-green-400 tracking-wider">
-                    AVAILABLE FOR PROJECTS
-                  </span>
-                </div>
+              {/* 1. Main Intro Card (2x2) - Adjusted Spacing */}
+              <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 pointer-events-auto flex flex-col justify-center text-left py-8 pr-8 lg:pr-12">
+
                 <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6 leading-tight">
                   Paramvir <br /> Ramola
                 </h1>
                 <h2 className="text-2xl text-cyan-400 font-medium mb-8 flex items-center gap-2">
-                  Senior Frontend Engineer{' '}
-                  <Code size={24} className="text-slate-600" />
+                  Frontend Engineer <Code size={24} className="text-slate-600" />
                 </h2>
-                <p className="text-slate-400 text-lg leading-relaxed max-w-md mb-8">
-                  I engineer resilient, high-performance web systems. Currently
-                  solving scale at{' '}
-                  <span className="text-white font-bold">AngelOne</span>.
-                </p>
-                <div className="flex flex-wrap gap-4 relative z-10">
+                <div className="text-slate-400 text-lg leading-relaxed max-w-md mb-8 space-y-2">
+                  <p>
+                    Building scalable frontend systems for high-traffic fintech and
+                    e-commerce platforms.
+                  </p>
+
+                </div>
+                <div className="flex flex-wrap gap-4 relative z-10 lg:hidden">
                   <button
                     onClick={handleUnlockSequence}
                     className="px-8 py-3 font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50"
@@ -334,34 +350,58 @@ export default function Portfolio() {
                     View Work <ArrowDown size={16} />
                   </a>
                 </div>
-              </div>
 
-              {/* 2. Interactive Gap (2x2) - Replaces Game - Pure empty space for physics interaction */}
-              <div className="hidden lg:block col-span-2 row-span-2 pointer-events-auto cursor-crosshair group">
-                {/* This space is intentionally left empty to allow user to play with the particle field */}
-                <div className="h-full w-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                  <span className="text-cyan-500/30 font-mono text-sm tracking-[0.5em] animate-pulse">
-                    INTERACT WITH FIELD
-                  </span>
+                {/* Compact Stats Row */}
+                <div className="mt-12 pt-8 border-t border-slate-800/50 grid grid-cols-3 gap-6">
+                  <div className="group">
+                    <div className="flex items-center gap-2 mb-2 text-emerald-400">
+                      <TrendingUp size={18} />
+                      <span className="text-xs font-bold font-mono tracking-wider text-emerald-500/80">FINTECH</span>
+                    </div>
+                    <div className="text-sm text-slate-300 font-medium">AngelOne</div>
+                  </div>
+
+                  <div className="group">
+                    <div className="flex items-center gap-2 mb-2 text-pink-400">
+                      <ShoppingBag size={18} />
+                      <span className="text-xs font-bold font-mono tracking-wider text-pink-500/80">ECOMMERCE</span>
+                    </div>
+                    <div className="text-sm text-slate-300 font-medium">Nykaa</div>
+                  </div>
+
+                  <div className="group">
+                    <div className="flex items-center gap-2 mb-2 text-cyan-400">
+                      <Clock size={18} />
+                      <span className="text-xs font-bold font-mono tracking-wider text-cyan-500/80">EXP</span>
+                    </div>
+                    <div className="text-sm text-slate-300 font-medium">5+ Years</div>
+                  </div>
                 </div>
               </div>
 
-              {/* 3. Experience Stats (1x1) - Floating Glass Card */}
-              <div className="col-span-1 bg-slate-900/30 backdrop-blur-sm border border-slate-800/50 rounded-3xl p-6 flex flex-col justify-center items-center hover:border-cyan-500/30 transition-all group pointer-events-auto">
-                <span className="text-5xl md:text-6xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
-                  5+
-                </span>
-                <span className="text-xs text-slate-400 uppercase tracking-widest text-center font-bold">
-                  Years Experience
-                </span>
-              </div>
+              {/* 2. Interactive Gap (Right Side) - Empty for physics interaction */}
+              <div className="hidden lg:block col-span-2 row-span-2 pointer-events-auto cursor-crosshair group relative">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                  <span className="text-cyan-500/20 font-mono text-xs tracking-[0.5em] animate-pulse">
+                    INTERACT WITH FIELD
+                  </span>
+                </div>
 
-              {/* 4. System Online (1x1) - Floating Glass Card */}
-              <div className="col-span-1 bg-slate-900/30 backdrop-blur-sm border border-slate-800/50 rounded-3xl p-6 flex items-center justify-center text-center pointer-events-auto">
-                <p className="text-slate-500 text-xs font-mono">
-                  <Power size={24} className="mx-auto mb-2 text-slate-600" />
-                  SYSTEM_ONLINE
-                </p>
+                {/* Desktop Buttons (Bottom Right) - Aligned to grid */}
+                <div className="absolute bottom-0 right-0 hidden lg:flex gap-4 z-20">
+                  <button
+                    onClick={handleUnlockSequence}
+                    className="px-8 py-3 font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-105"
+                  >
+                    Contact Me <Mail size={16} />
+                  </button>
+                  <a
+                    href="#projects"
+                    className="px-8 py-3 bg-slate-900/80 backdrop-blur border border-slate-700 text-white font-bold rounded-full hover:bg-slate-800 transition-all flex items-center gap-2 hover:scale-105"
+                  >
+                    View Work <ArrowDown size={16} />
+                  </a>
+                </div>
               </div>
             </div>
           </section>
@@ -655,17 +695,23 @@ export default function Portfolio() {
                 company="AngelOne"
                 period="05/2024 – Present"
                 highlights={[
-                  'Created TWA Lens (Best Innovation Idea): An on-device WebView debugging tool.',
-                  'Built SvelteKit-based Trading Services for Order History & Algo Trading.',
-                  'Established automated pipelines (n8n) for daily Web Vitals performance reports.',
-                  'Resolved critical memory leaks in PnL services, reducing usage by 30-40%.',
+                  'Contributed to frontend architecture for the StoreFront platform team supporting 20+ sub-modules within the Angel One super app.',
+                  'Proposed and built TWA Lens, a Chrome DevTools–like debugging experience for WebViews, significantly reducing debugging time and QA by eliminating USB debugging.',
+                  'Developed and maintained core Trading Frontend modules including Order History, Algo Trading, and Download Reports, integrating with RESTful APIs.',
+                  'Identified and fixed memory leaks in TnC, PnL, and Ledger services, reducing memory usage by 30–40%.',
+                  'Migrated multiple frontend applications from SvelteKit v2 to v4 and added partial offline support.',
+                  'Set up Slack alerts for 5xx errors and built an automated pipeline for daily frontend performance reports via n8n.',
                 ]}
                 skills={[
+                  'Svelte',
                   'SvelteKit',
                   'TypeScript',
-                  'Web Security',
+                  'Tailwind',
+                  'Vite',
+                  'SolidJS',
                   'n8n',
-                  'Performance',
+                  'Grafana',
+                  'AWS',
                 ]}
               />
 
@@ -675,14 +721,31 @@ export default function Portfolio() {
                 type="ecommerce"
                 role="Software Engineer 2"
                 company="Nykaa"
-                period="09/2020 – 05/2024"
+                period="09/2020 – 04/2024"
                 highlights={[
-                  'Engineered Image Optimization strategies, reducing CDN cache from 1.6TB to 0.8TB (50% reduction).',
-                  'Led the analytics infrastructure migration from Adobe Launch to Mixpanel.',
-                  'Improved homepage performance by 18% via above-the-fold rendering optimization.',
-                  'Identified and patched a critical memory leak in the Node.js server layer.',
+                  'Worked on and contributed to building nykaafashion.com, focusing on core features and platform quality.',
+                  'Implemented image optimization strategies, reducing ImageKit cache usage from 1.6 TB to 600 MB.',
+                  'Identified and fixed a memory leak in the Node server by correcting hash key logic for cached API responses (20% reduction).',
+                  'Improved homepage performance by 18% using above-the-fold rendering and lazy loading on scroll.',
+                  'Reduced CLS by 72% on the Product Details page and by 79% on the Product Listing page.',
+                  'Built and maintained key user-facing features including Wishlist, Coupons, PDP, and Cart.',
+                  'Migrated Remote Configuration from Firebase to AWS S3 to control feature flags and website config.',
+                  'Implemented GDPR-compliant user consent controls for data usage across the website.',
+                  'Led the analytics migration from Adobe Launch to Mixpanel by integrating Mixpanel with GTM.',
                 ]}
-                skills={['React', 'Node.js', 'Redis', 'AWS S3', 'Mixpanel']}
+                skills={[
+                  'React',
+                  'Node.js',
+                  'JavaScript',
+                  'HTML/CSS',
+                  'Redux',
+                  'Jest',
+                  'RTL',
+                  'Webpack',
+                  'GTM',
+                  'Adobe Analytics',
+                  'Mixpanel',
+                ]}
               />
             </div>
           </section>
@@ -723,7 +786,10 @@ export default function Portfolio() {
           </section>
 
           {/* Footer with Scroll-Triggered Unlock Animation */}
-          <FooterSection triggerUnlock={wasUnlockedViaButton} />
+          <FooterSection
+            triggerUnlock={wasUnlockedViaButton}
+            onLockedClick={() => handleLockedInteraction("Access Denied! Use the 'Contact Me' button.")}
+          />
         </main>
       </div>
     </div>
