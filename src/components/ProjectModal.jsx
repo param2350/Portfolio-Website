@@ -13,13 +13,13 @@ const ProjectModal = ({ project, onClose }) => {
   if (!project) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-24 md:pt-20 md:pb-8 overflow-y-auto">
       <div
         className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
         onClick={onClose}
       ></div>
 
-      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl max-h-[80vh] md:max-h-[85vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-300">
         {/* Decor */}
         <div
           className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${project.gradient.replace('from-', 'from-').replace('to-', 'to-').replace('/10', '')}`}

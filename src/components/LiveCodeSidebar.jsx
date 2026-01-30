@@ -44,87 +44,274 @@ const LiveCodeSidebar = ({ activeSection }) => {
     switch (file) {
       case 'intro.tsx':
         return `
-// Paramvir Ramola
-// Senior Frontend Engineer
-// Implementing scalable systems...
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Code, Zap, Shield } from 'lucide-react';
 
-const Specialist = {
-  name: "Paramvir Ramola",
-  role: "Senior Frontend Engineer",
-  focus: ["Performance", "Scalability", "UX"],
-  status: "Available for new challenges"
+interface Props {
+  name: string;
+  role: string;
+  isAvailable: boolean;
+}
+
+export const DeveloperCard: React.FC<Props> = ({ 
+  name, 
+  role, 
+  isAvailable 
+}) => {
+  return (
+    <motion.div 
+      className="relative p-8 rounded-3xl bg-slate-900"
+      whileHover={{ scale: 1.02 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <h1 className="text-5xl font-bold text-white">
+        {name}
+      </h1>
+      
+      <h2 className="text-2xl text-cyan-400 mt-4">
+        {role}
+      </h2>
+
+      <div className="flex gap-4 mt-8">
+        <Badge icon={Code} label="TypeScript" />
+        <Badge icon={Zap} label="Performance" />
+        <Badge icon={Shield} label="Security" />
+      </div>
+
+      {isAvailable && (
+        <span className="absolute top-4 right-4 
+          flex items-center gap-2 text-green-400">
+          <span className="w-2 h-2 bg-green-400 
+            rounded-full animate-pulse" />
+          Open to Work
+        </span>
+      )}
+    </motion.div>
+  );
 };
-
-export default Specialist;
 `;
       case 'twa_lens_config.ts':
         return `
-export const TWALensConfig = {
-    target: "WebView",
-    features: [
-        "NetworkInspector",
-        "ConsoleStreaming",
-        "CSSInspector",
-        "PerformanceMonitor"
-    ],
-    deviceSupport: ["Android", "iOS"],
-    security: {
-        piiMasking: true,
-        tlsValidation: true
-    }
+import React, { useState } from 'react';
+import { Network, Terminal, Palette } from 'lucide-react';
+
+// TWA Lens - DevTools for WebViews
+// No USB debugging required!
+
+export const TWALensPanel: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('network');
+  const [logs, setLogs] = useState<ConsoleLog[]>([]);
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 
+      h-[40vh] bg-slate-950 border-t border-slate-800">
+      
+      {/* Tab Bar */}
+      <nav className="flex gap-1 p-2 bg-slate-900">
+        <TabButton 
+          icon={<Network size={14} />}
+          label="Network"
+          active={activeTab === 'network'}
+          onClick={() => setActiveTab('network')}
+        />
+        <TabButton
+          icon={<Terminal size={14} />} 
+          label="Console"
+          active={activeTab === 'console'}
+          onClick={() => setActiveTab('console')}
+        />
+        <TabButton
+          icon={<Palette size={14} />}
+          label="Elements"
+          active={activeTab === 'elements'}
+          onClick={() => setActiveTab('elements')}
+        />
+      </nav>
+
+      {/* Network Inspector */}
+      {activeTab === 'network' && (
+        <NetworkTable 
+          requests={capturedRequests}
+          onSelect={inspectRequest}
+        />
+      )}
+
+      {/* Console Logs */}
+      {activeTab === 'console' && (
+        <ConsoleViewer 
+          logs={logs}
+          maskPII={true}  // Security: Hide sensitive data
+        />
+      )}
+    </div>
+  );
 };
 `;
       case 'performance_metrics.rs':
         return `
-struct WebVitals {
-    lcp: Duration,
-    fid: Duration,
-    cls: f32,
+// Core Web Vitals Optimization @ Nykaa
+// Achieved significant improvements on high-traffic pages
+
+#[derive(Debug, Clone)]
+pub struct WebVitalsReport {
+    pub page: PageType,
+    pub lcp: Duration,      // Largest Contentful Paint
+    pub fid: Duration,      // First Input Delay  
+    pub cls: f32,           // Cumulative Layout Shift
 }
 
-impl WebVitals {
-    fn optimize(&mut self) {
-        // Reduced LCP by 40%
-        self.lcp = Duration::from_millis(800);
-        // Zero layout shifts
-        self.cls = 0.0;
+impl WebVitalsReport {
+    /// Optimizations applied to Product Listing Page
+    pub fn optimize_plp(&mut self) -> Result<Improvements> {
+        // Before: CLS = 0.42 (Poor)
+        // After:  CLS = 0.09 (Good) — 79% reduction!
+        
+        self.apply_skeleton_loaders()?;
+        self.reserve_image_dimensions()?;
+        self.lazy_load_below_fold()?;
+        
+        Ok(Improvements {
+            cls_reduction: 0.79,
+            lcp_improvement: Duration::from_millis(400),
+        })
+    }
+
+    /// Memory leak fixes in Ledger & PnL services
+    pub fn fix_memory_leaks(&self) -> MemoryStats {
+        // Identified: Detached DOM nodes, unclosed sockets
+        // Result: 40% memory reduction
+        
+        cleanup_detached_nodes();
+        close_stale_connections();
+        
+        MemoryStats { saved_mb: 120 }
     }
 }
 `;
       case 'tech_stack.json':
         return `
 {
-  "frontend": ["React", "Svelte", "Next.js"],
-  "backend": ["Node.js", "Rust", "Go"],
-  "infrastructure": ["AWS", "Docker", "K8s"],
-  "tools": ["Figma", "Postman", "Grafana"]
+  "frontend": {
+    "frameworks": ["React", "Svelte", "SvelteKit", "SolidJS"],
+    "styling": ["Tailwind CSS", "Emotion", "CSS Modules"],
+    "state": ["Redux", "Zustand", "Svelte Stores"],
+    "build": ["Vite", "Webpack", "Rollup"]
+  },
+  
+  "languages": {
+    "primary": ["TypeScript", "JavaScript"],
+    "markup": ["HTML5", "CSS3", "SCSS"]
+  },
+  
+  "testing": {
+    "unit": ["Jest", "Vitest"],
+    "integration": ["React Testing Library"],
+    "e2e": ["Playwright", "Cypress"]
+  },
+  
+  "devops": {
+    "cloud": ["AWS S3", "CloudFront", "Lambda"],
+    "monitoring": ["Grafana", "New Relic"],
+    "automation": ["n8n", "GitHub Actions"]
+  },
+  
+  "analytics": {
+    "tools": ["Mixpanel", "Adobe Analytics", "GTM"],
+    "migrations": ["Adobe Launch → Mixpanel via GTM"]
+  }
 }
 `;
       case 'career_graph.ts':
         return `
-const career = new Timeline();
+import React from 'react';
+import { TrendingUp, ShoppingBag } from 'lucide-react';
 
-career.add({
-  company: "AngelOne",
-  role: "SDE 2",
-  impact: "Built TWA Lens, 30% Perf Boost"
-});
+interface Experience {
+  company: string;
+  role: string;
+  period: string;
+  type: 'fintech' | 'ecommerce';
+}
 
-career.add({
-  company: "Nykaa",
-  role: "Software Engineer",
-  impact: "CDN Opt, Metric Migration"
-});
+const experiences: Experience[] = [
+  {
+    company: 'AngelOne',
+    role: 'SDE 2',
+    period: '2024 - Present',
+    type: 'fintech'
+  },
+  {
+    company: 'Nykaa',
+    role: 'Software Engineer 2',
+    period: '2020 - 2024',
+    type: 'ecommerce'
+  }
+];
+
+export const Timeline: React.FC = () => (
+  <div className="space-y-4">
+    {experiences.map((exp, i) => (
+      <article 
+        key={exp.company}
+        className="p-6 rounded-2xl bg-slate-900 
+          border border-slate-800 
+          hover:border-cyan-500/50 transition-all"
+      >
+        <div className="flex items-center gap-3">
+          {exp.type === 'fintech' ? (
+            <TrendingUp className="text-emerald-400" />
+          ) : (
+            <ShoppingBag className="text-pink-400" />
+          )}
+          <h3 className="text-xl font-bold text-white">
+            {exp.company}
+          </h3>
+        </div>
+        
+        <p className="text-cyan-400 mt-2">{exp.role}</p>
+        <time className="text-slate-500 text-sm">
+          {exp.period}
+        </time>
+      </article>
+    ))}
+  </div>
+);
 `;
       case 'publications.md':
         return `
-# Recent Articles
+# Technical Writing
 
-- [Matcha.css](https://medium.com/...)
-- [Singleton Pattern](https://medium.com/...)
-- [CSP Unleashed](https://medium.com/...)
+Sharing knowledge through detailed articles on Medium.
 
- Sharing knowledge is key to growth.
+---
+
+## Latest Articles
+
+### 🎨 Matcha.css
+Transform your web pages instantly with this 
+classless CSS framework. Zero config, pure elegance.
+→ Read on Medium
+
+### 🔒 CSP Unleashed  
+Your web bodyguard against cyber invaders.
+Deep dive into Content Security Policy.
+→ Read on Medium
+
+### 🔧 DevTools Mastery
+Stop using just 10% of Chrome DevTools.
+Here's what you're missing.
+→ Read on Medium
+
+### 📐 Singleton Pattern
+Exploring the magic of design patterns.
+When and why to use Singletons.
+→ Read on Medium
+
+---
+
+> "The best way to learn is to teach."
 `;
       default:
         return '// Select a file to view code';

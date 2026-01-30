@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Lock, Mail, Github, Linkedin } from 'lucide-react';
 
 // --- Footer Contact Section - Locked until Contact Me is clicked ---
-const FooterSection = ({ triggerUnlock, onLockedClick }) => {
-  const [phase, setPhase] = useState('locked'); // locked -> unlocking -> revealed
+const FooterSection = ({ triggerUnlock, onLockedClick, forceOpen = false }) => {
+  const [phase, setPhase] = useState(forceOpen ? 'revealed' : 'locked'); // locked -> unlocking -> revealed
   const footerRef = useRef(null);
 
   // Trigger unlock animation ONLY when button is clicked
@@ -18,6 +18,17 @@ const FooterSection = ({ triggerUnlock, onLockedClick }) => {
       }, 1200);
     }
   }, [triggerUnlock, phase]);
+
+  // Handle dynamic changes to forceOpen (e.g. resize)
+  useEffect(() => {
+    if (forceOpen) {
+      setPhase('revealed');
+    } else if (!triggerUnlock && phase === 'revealed') {
+      // Optional: re-lock if screen grows and wasn't manually unlocked?
+      // For now, let's keep it consistent: if desktop mode returns, it locks UNLESS button was clicked.
+      setPhase('locked');
+    }
+  }, [forceOpen]);
 
   const isRevealed = phase === 'revealed';
   const isUnlocking = phase === 'unlocking' || phase === 'revealed';

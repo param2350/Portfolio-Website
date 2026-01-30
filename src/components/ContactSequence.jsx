@@ -94,7 +94,7 @@ const ContactSequence = ({ onClose }) => {
 
         {/* Map Visual (Active Tracking) */}
         <div
-          className={`absolute -right-4 -bottom-16 transition-all duration-500 opacity-100 translate-y-0`}
+          className={`mt-8 md:mt-0 md:absolute md:-right-16 md:-bottom-12 transition-all duration-500 opacity-100 translate-y-0`}
         >
           <div
             className={`bg-slate-800/90 p-4 rounded-xl border ${step === 1 ? 'border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.2)]' : 'border-slate-700'} shadow-2xl flex items-center gap-4`}

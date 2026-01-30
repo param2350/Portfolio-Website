@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   TrendingUp,
   ShoppingBag,
@@ -21,6 +21,7 @@ import {
   Mail,
   Palette,
   Terminal,
+  FileText,
 } from 'lucide-react';
 import HangingMonkey from './components/HangingMonkey';
 import HeroParticles from './components/HeroParticles';
@@ -39,77 +40,36 @@ import { PROJECTS } from './data/projectsData';
 
 const VisualCard = ({ title, icon: Icon, children, gradient }) => (
   <div
-    className={`relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/50 p-6 md:p-8 transition-all hover:border-slate-600 group h-full flex flex-col min-w-[85vw] md:min-w-0 snap-center`}
+    className={`relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/50 p-6 md:p-10 transition-all hover:border-slate-600 group h-[420px] md:h-full flex flex-col min-w-[85vw] md:min-w-0 snap-start`}
   >
     <div
-      className={`absolute -right-10 -top-10 h-40 w-40 rounded-full blur-[80px] opacity-20 ${gradient}`}
+      className={`absolute -right-10 -top-10 h-40 w-40 md:h-56 md:w-56 rounded-full blur-[80px] opacity-20 ${gradient}`}
     ></div>
     <div className="relative z-10 flex flex-col h-full">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
         <div
-          className={`p-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 group-hover:scale-110 transition-transform duration-300`}
+          className={`p-3 md:p-4 rounded-lg md:rounded-xl bg-slate-950 border border-slate-800 text-slate-200 group-hover:scale-110 transition-transform duration-300`}
         >
-          <Icon size={24} />
+          <Icon size={24} className="md:w-7 md:h-7" />
         </div>
-        <h3 className="text-xl font-bold text-white">{title}</h3>
+        <h3 className="text-xl md:text-2xl font-bold text-white">{title}</h3>
       </div>
-      <div className="flex-1">{children}</div>
+      <div className="flex-1 md:text-base">{children}</div>
     </div>
   </div>
 );
 
-const ProgressBar = ({ label, before, after, colorClass, unit, max }) => {
-  const reduction = before - after;
-  const percentage = Math.round((reduction / before) * 100);
-
-  return (
-    <div className="mb-4 last:mb-0">
-      <div className="flex justify-between items-end text-xs font-mono text-slate-500 mb-2">
-        <span>{label}</span>
-        <span
-          className={`${colorClass} font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800`}
-        >
-          -{percentage}% Reduction
-        </span>
-      </div>
-      <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden relative">
-        <div
-          className="absolute top-0 left-0 h-full bg-slate-700"
-          style={{ width: `${(before / max) * 100}%` }}
-        ></div>
-        <div
-          className={`absolute top-0 left-0 h-full ${colorClass.replace('text-', 'bg-')} transition-all duration-1000 ease-out z-10`}
-          style={{ width: `${(after / max) * 100}%` }}
-        ></div>
-      </div>
-      <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
-        <span>0</span>
-        <div className="flex gap-8">
-          <span className={colorClass}>
-            Now: {after}
-            {unit}
-          </span>
-          <span className="text-slate-600">
-            Was: {before}
-            {unit}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const SecurityList = ({ items }) => (
-  <div className="space-y-3">
+  <div className="space-y-3 md:space-y-4">
     {items.map((item, idx) => (
       <div
         key={idx}
-        className="flex items-start gap-3 p-3 rounded-lg bg-slate-950/50 border border-slate-900/50 hover:bg-slate-900 transition-colors"
+        className="flex items-start gap-3 p-3 md:p-4 rounded-lg bg-slate-950/50 border border-slate-900/50 hover:bg-slate-900 transition-colors"
       >
         <div className="mt-0.5 text-emerald-500 shrink-0">
-          <CheckCircle size={16} />
+          <CheckCircle size={16} className="md:w-5 md:h-5" />
         </div>
-        <div className="text-sm text-slate-400">
+        <div className="text-sm md:text-base text-slate-400">
           <span className="text-slate-200 font-medium block mb-0.5">
             {item.title}
           </span>
@@ -125,22 +85,22 @@ const ArticleCard = ({ title, link, icon: Icon }) => (
     href={link}
     target="_blank"
     rel="noopener noreferrer"
-    className="block p-6 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-900/60 transition-all group h-full min-w-[85vw] md:min-w-0 snap-center"
+    className="block p-6 md:p-8 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-900/60 transition-all group h-[200px] md:h-full min-w-[85vw] md:min-w-0 snap-start"
   >
-    <div className="flex items-start justify-between mb-4">
-      <div className="p-2 bg-slate-950 rounded-lg border border-slate-800 text-slate-400 group-hover:text-cyan-400 transition-colors">
-        <Icon size={20} />
+    <div className="flex items-start justify-between mb-4 md:mb-6">
+      <div className="p-2 md:p-3 bg-slate-950 rounded-lg md:rounded-xl border border-slate-800 text-slate-400 group-hover:text-cyan-400 transition-colors">
+        <Icon size={20} className="md:w-6 md:h-6" />
       </div>
       <ExternalLink
         size={16}
-        className="text-slate-600 group-hover:text-cyan-400"
+        className="text-slate-600 group-hover:text-cyan-400 md:w-5 md:h-5"
       />
     </div>
-    <h3 className="text-lg font-bold text-slate-200 group-hover:text-white leading-tight mb-2">
+    <h3 className="text-lg md:text-xl font-bold text-slate-200 group-hover:text-white leading-tight mb-2">
       {title}
     </h3>
-    <p className="text-xs text-slate-500 font-mono mt-auto pt-4 flex items-center gap-2">
-      <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+    <p className="text-xs md:text-sm text-slate-500 font-mono mt-auto pt-4 flex items-center gap-2">
+      <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500"></span>
       Read on Medium
     </p>
   </a>
@@ -153,18 +113,150 @@ export default function Portfolio() {
   const [devMode, setDevMode] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
-  const [isFooterLocked, setIsFooterLocked] = useState(true);
+  // Default to unlocked on mobile (< 768px), locked on desktop
+  const [isFooterLocked, setIsFooterLocked] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  );
   const [showContactSequence, setShowContactSequence] = useState(false);
 
   const [wasUnlockedViaButton, setWasUnlockedViaButton] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [monkeyMessage, setMonkeyMessage] = useState('');
 
+  // Name animation states
+  const [nameAnimationPhase, setNameAnimationPhase] = useState(0);
+  const [nameAnimationComplete, setNameAnimationComplete] = useState(false);
+  const [typedName, setTypedName] = useState('');
+  const [currentStyle, setCurrentStyle] = useState('');
+  const nameAnimationStarted = useRef(false);
+
+
+  // Ref for measuring first name width for perfect alignment
+  const paramvirRef = useRef(null);
+  const [nameOffset, setNameOffset] = useState(0);
+
+  // Check window size on mount/resize to unlock footer on mobile
+  useEffect(() => {
+    const checkMobileUnlock = () => {
+      if (window.innerWidth < 768) {
+        setIsFooterLocked(false);
+      }
+    };
+
+    checkMobileUnlock();
+    window.addEventListener('resize', checkMobileUnlock);
+    return () => window.removeEventListener('resize', checkMobileUnlock);
+  }, []);
+
+  // Measure name width on resize/mount
+  useEffect(() => {
+    const updateOffset = () => {
+      if (paramvirRef.current) {
+        // Measure width of "Paramvir" + space
+        // Using getBoundingClientRect for sub-pixel precision if needed, but offsetWidth is usually fine
+        // Adding a small gap for the space character (~0.25em of the current font size)
+        const width = paramvirRef.current.offsetWidth;
+        // Approximation of space width (about 20-30% of a character or computed style)
+        // Let's just use the rendered width if we include the space in the span? 
+        // Or cleaner: add a fixed gap proportional to font size?
+        // Let's try adding 0.3em (typical space width)
+        const computedStyle = window.getComputedStyle(paramvirRef.current);
+        const fontSize = parseFloat(computedStyle.fontSize);
+        const spaceWidth = fontSize * 0.25;
+
+        setNameOffset(width + spaceWidth);
+      }
+    };
+
+    // Initial measure - might need to wait for fonts or layout?
+    // Using a timeout to ensure render
+    setTimeout(updateOffset, 100);
+    window.addEventListener('resize', updateOffset);
+    return () => window.removeEventListener('resize', updateOffset);
+  }, [showWelcome]); // Re-measure when welcome screen goes away (and DOM exists)
+
+  // Engineering carousel state
+  const [engineeringSlide, setEngineeringSlide] = useState(0);
+  const engineeringCarouselRef = useRef(null);
+  const engineeringCardCount = 5; // Total number of cards
+
+
+  // Articles carousel state
+  const [articlesSlide, setArticlesSlide] = useState(0);
+  const articlesCarouselRef = useRef(null);
+  const articlesCardCount = 4; // Total number of article cards
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Lock Body Scroll when Welcome Screen is active
+  useEffect(() => {
+    if (showWelcome) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [showWelcome]);
+
+  // Name animation sequence - starts after welcome screen closes
+  useEffect(() => {
+    if (showWelcome || nameAnimationStarted.current) return;
+
+    nameAnimationStarted.current = true;
+    const fullName = 'paramvir ramola';
+    let charIndex = 0;
+    const timeouts = [];
+
+    // Phase 1: Typing animation
+    setNameAnimationPhase(1);
+    setCurrentStyle('typing...');
+
+    const typingInterval = setInterval(() => {
+      if (charIndex <= fullName.length) {
+        setTypedName(fullName.slice(0, charIndex));
+        charIndex++;
+      } else {
+        clearInterval(typingInterval);
+
+        // Continue with other phases after typing completes
+        // Continue with other phases after typing completes - OPTIMIZED SPEED & MERGED COLORS
+        const phases = [
+          // Phase 2: Scale up & Slide down + RED
+          { delay: 200, phase: 2, style: 'font-size: 5rem; color: #ef4444' },
+          // Phase 3: Display block
+          { delay: 800, phase: 3, style: 'display: block' },
+          // Phase 4: UPPERCASE + GREEN
+          { delay: 1400, phase: 4, style: 'text-transform: UPPERCASE; color: #22c55e' },
+          // Phase 5: lowercase + BLUE
+          { delay: 1700, phase: 5, style: 'text-transform: lowercase; color: #3b82f6' },
+          // Phase 6: Capitalize + CYAN GRADIENT
+          { delay: 2000, phase: 6, style: 'text-transform: capitalize; color: cyan-gradient' },
+          // Phase 7: Complete
+          { delay: 2800, phase: 7, style: '✓ complete' },
+        ];
+
+        phases.forEach(({ delay, phase, style }) => {
+          const timeoutId = setTimeout(() => {
+            setNameAnimationPhase(phase);
+            setCurrentStyle(style);
+            if (phase === 7) {
+              setTimeout(() => setNameAnimationComplete(true), 1200);
+            }
+          }, delay);
+          timeouts.push(timeoutId);
+        });
+      }
+    }, 50); // Slightly faster typing (60ms -> 50ms)
+
+    return () => {
+      clearInterval(typingInterval);
+      timeouts.forEach(id => clearTimeout(id));
+    };
+  }, [showWelcome]);
 
   // Intersection Observer for Sections
   useEffect(() => {
@@ -185,15 +277,128 @@ export default function Portfolio() {
     return () => sections.forEach((section) => observer.unobserve(section));
   }, []);
 
-  const handleUnlockSequence = () => {
-    if (!isFooterLocked) {
-      document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
-      return;
+  // Auto-scroll for engineering carousel (mobile only)
+  const scrollToSlide = useCallback((index) => {
+    if (engineeringCarouselRef.current) {
+      const container = engineeringCarouselRef.current;
+      const cards = container.children;
+      if (cards[index]) {
+        // Scroll to the card's left position relative to container
+        const card = cards[index];
+        container.scrollTo({
+          left: card.offsetLeft,
+          behavior: 'smooth'
+        });
+      }
     }
-    // Start the overlay sequence
-    setMonkeyMessage(''); // Clear any denial messages
-    setShowContactSequence(true);
-  };
+    setEngineeringSlide(index);
+  }, []);
+
+  useEffect(() => {
+    // Only auto-scroll on mobile
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) return;
+
+    const interval = setInterval(() => {
+      setEngineeringSlide((prev) => {
+        const next = (prev + 1) % engineeringCardCount;
+        scrollToSlide(next);
+        return next;
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [scrollToSlide]);
+
+  // Update active slide on manual scroll
+  useEffect(() => {
+    const container = engineeringCarouselRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const cards = container.children;
+      const scrollLeft = container.scrollLeft;
+
+      // Find which card is most visible
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      for (let i = 0; i < cards.length; i++) {
+        const distance = Math.abs(cards[i].offsetLeft - scrollLeft);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      }
+
+      if (closestIndex !== engineeringSlide) {
+        setEngineeringSlide(closestIndex);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [engineeringSlide]);
+
+  // Auto-scroll for articles carousel (mobile only)
+  const scrollToArticleSlide = useCallback((index) => {
+    if (articlesCarouselRef.current) {
+      const container = articlesCarouselRef.current;
+      const cards = container.children;
+      if (cards[index]) {
+        const card = cards[index];
+        container.scrollTo({
+          left: card.offsetLeft,
+          behavior: 'smooth'
+        });
+      }
+    }
+    setArticlesSlide(index);
+  }, []);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) return;
+
+    const interval = setInterval(() => {
+      setArticlesSlide((prev) => {
+        const next = (prev + 1) % articlesCardCount;
+        scrollToArticleSlide(next);
+        return next;
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [scrollToArticleSlide]);
+
+  // Update active slide on manual scroll for articles
+  useEffect(() => {
+    const container = articlesCarouselRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const cards = container.children;
+      const scrollLeft = container.scrollLeft;
+
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      for (let i = 0; i < cards.length; i++) {
+        const distance = Math.abs(cards[i].offsetLeft - scrollLeft);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      }
+
+      if (closestIndex !== articlesSlide) {
+        setArticlesSlide(closestIndex);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [articlesSlide]);
 
   const onSequenceComplete = () => {
     setShowContactSequence(false);
@@ -203,6 +408,23 @@ export default function Portfolio() {
     setTimeout(() => {
       document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
     }, 100);
+  };
+
+  const handleUnlockSequence = () => {
+    if (!isFooterLocked) {
+      document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    // Mobile check: Skip animation for screens smaller than 768px
+    if (window.innerWidth < 768) {
+      onSequenceComplete();
+      return;
+    }
+
+    // Start the overlay sequence
+    setMonkeyMessage(''); // Clear any denial messages
+    setShowContactSequence(true);
   };
 
   const handleLockedInteraction = (message) => {
@@ -216,7 +438,7 @@ export default function Portfolio() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${devMode ? 'bg-[#0a0a0a] font-mono selection:bg-purple-500/30' : 'bg-slate-950 font-sans selection:bg-cyan-500/30'} text-slate-200`}
+      className={`min-h-screen transition-colors duration-500 ${devMode ? 'bg-[#0a0a0a] font-mono selection:bg-purple-500/30' : 'bg-slate-900 font-sans selection:bg-cyan-500/30'} text-slate-200`}
     >
       {/* Welcome Screen Overlay */}
       {showWelcome && <WelcomeScreen onComplete={() => setShowWelcome(false)} />}
@@ -236,30 +458,53 @@ export default function Portfolio() {
         <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.1),transparent_70%)] pointer-events-none"></div>
       )}
 
-      {/* Mascot - Now Interactive */}
-      <HangingMonkey
-        onClick={handleUnlockSequence}
-        isFooterLocked={isFooterLocked}
-        forceMessage={monkeyMessage}
-      />
+      {/* Mascot - Now Interactive (Desktop Only) */}
+      <div className="hidden md:block">
+        <HangingMonkey
+          onClick={handleUnlockSequence}
+          isFooterLocked={isFooterLocked}
+          forceMessage={monkeyMessage}
+        />
+      </div>
 
       {/* Navigation */}
       <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled || devMode ? 'bg-slate-950/90 backdrop-blur-md border-b border-slate-800' : 'bg-transparent'}`}
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled || devMode ? 'bg-slate-950/90 backdrop-blur-md border-b border-slate-800' : 'md:bg-transparent bg-slate-950/90 backdrop-blur-md'}`}
       >
-        <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
+          {/* Logo - Always visible on mobile, show on scroll for desktop */}
           <div
-            className={`flex items-center gap-2 font-bold text-xl tracking-tighter text-white transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0'}`}
+            className={`flex items-center gap-2 font-bold text-lg md:text-xl tracking-tighter text-white transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'md:opacity-0 opacity-100'}`}
           >
             {devMode ? (
-              <Terminal className="text-green-500" size={20} />
+              <Terminal className="text-green-500" size={18} />
             ) : (
-              <Activity className="text-cyan-400" size={20} />
+              <Activity className="text-cyan-400" size={18} />
             )}
-            Paramvir Ramola
+            <span className="hidden sm:inline">Paramvir Ramola</span>
+            <span className="sm:hidden">PR</span>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 md:gap-6">
+            {/* Mobile Header Buttons */}
+            <div className="flex md:hidden items-center gap-2">
+              <button
+                onClick={handleUnlockSequence}
+                className="px-4 py-2 font-bold rounded-full transition-all flex items-center gap-1.5 bg-white text-slate-950 text-sm"
+              >
+                Contact <Mail size={14} />
+              </button>
+              <a
+                href="https://drive.google.com/file/d/1V1oKf0zFjxxOvCT5tSWDR_CHhHU2l1CI/view?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-full flex items-center gap-1.5 text-sm"
+              >
+                Resume <FileText size={14} />
+              </a>
+            </div>
+
+            {/* Desktop Navigation */}
             {!devMode && (
               <div className="hidden md:flex gap-6 text-sm font-medium text-slate-400">
                 <a
@@ -291,7 +536,7 @@ export default function Portfolio() {
 
             <button
               onClick={() => setDevMode(!devMode)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${devMode ? 'bg-green-500/10 text-green-400 border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.2)]' : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-cyan-500/50 hover:text-cyan-400'}`}
+              className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${devMode ? 'bg-green-500/10 text-green-400 border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.2)]' : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-cyan-500/50 hover:text-cyan-400'}`}
             >
               {devMode ? <Code size={14} /> : <Eye size={14} />}
               {devMode ? 'EXIT TERMINAL' : 'VIEW SOURCE'}
@@ -321,62 +566,151 @@ export default function Portfolio() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full relative z-10 pointer-events-none">
               {/* 1. Main Intro Card (2x2) - Now Transparent/Glassy to show points */}
               {/* 1. Main Intro Card (2x2) - Adjusted Spacing */}
-              <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 pointer-events-auto flex flex-col justify-center text-left py-8 pr-8 lg:pr-12">
+              <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 pointer-events-auto flex flex-col justify-center text-left py-4 md:py-8 pr-4 md:pr-8 lg:pr-12">
 
-                <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6 leading-tight">
-                  Paramvir <br /> Ramola
-                </h1>
-                <h2 className="text-2xl text-cyan-400 font-medium mb-8 flex items-center gap-2">
-                  Frontend Engineer <Code size={24} className="text-slate-600" />
-                </h2>
-                <div className="text-slate-400 text-lg leading-relaxed max-w-md mb-8 space-y-2">
-                  <p>
-                    Building scalable frontend systems for high-traffic fintech and
-                    e-commerce platforms.
-                  </p>
-
+                {/* Style indicator - Single line above name */}
+                <div className="h-4 md:h-6 mb-1">
+                  {!showWelcome && !nameAnimationComplete && (
+                    <div
+                      className={`font-mono text-[10px] md:text-sm transition-all duration-300 ${nameAnimationPhase >= 11 ? 'opacity-0' : 'opacity-100'
+                        }`}
+                    >
+                      <span className="text-slate-600">{'> '}</span>
+                      <span className="text-purple-400">{currentStyle}</span>
+                      <span className="text-slate-600">;</span>
+                      <span className="animate-pulse text-cyan-400 ml-1">▊</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex flex-wrap gap-4 relative z-10 lg:hidden">
+
+                {/* The Animated Name - Fixed height container to prevent layout shifts */}
+                <div className="relative h-[105px] md:h-[200px]">
+
+                  {/* Typing overlay - shows during phase 1, fades out when phase 2 starts */}
+                  {/* Scale 0.4 makes text-8xl appear like ~text-3xl for typing effect */}
+                  {/* whitespace-nowrap keeps it on single line during typing */}
+                  <div
+                    className="absolute top-0 left-0 font-bold tracking-tight text-5xl md:text-8xl text-white whitespace-nowrap"
+                    style={{
+                      transform: 'scale(0.4)',
+                      transformOrigin: 'top left',
+                      opacity: nameAnimationPhase === 1 && !showWelcome ? 1 : 0,
+                      transition: 'opacity 0.2s ease-out',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {typedName}
+                    <span className="animate-pulse">|</span>
+                  </div>
+
+                  {/* Main name - always rendered, animates with transforms */}
+                  {/* Visible from phase 2 (swaps with typing overlay), starts at scale 0.4 then scales up */}
+                  <h1 className="absolute top-0 left-0 font-bold tracking-tight leading-[1.1] text-5xl md:text-8xl">
+                    <div
+                      className="flex flex-col whitespace-nowrap"
+                      style={{
+                        // HIDE during Phase 1 (Typing) to prevent double-text/ghosting
+                        opacity: nameAnimationPhase >= 2 && !showWelcome ? 1 : 0,
+                        transition: 'opacity 0.1s linear',
+                      }}
+                    >
+                      {/* First name - Paramvir */}
+                      <span
+                        ref={paramvirRef}
+                        className={`inline-block ${nameAnimationPhase >= 6 ? 'bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent' : ''
+                          }`}
+                        style={{
+                          transform: nameAnimationPhase >= 2 ? 'scale(1)' : 'scale(0.4)',
+                          transformOrigin: 'top left',
+                          color: nameAnimationPhase === 2 ? '#ef4444' : // Red on Scale
+                            nameAnimationPhase === 3 ? '#ef4444' :
+                              nameAnimationPhase === 4 ? '#22c55e' : // Green on Upper
+                                nameAnimationPhase === 5 ? '#3b82f6' : // Blue on Lower
+                                  undefined, // Gradient handles rest
+                          transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease-out',
+                        }}
+                      >
+                        {nameAnimationPhase >= 6 ? 'Paramvir' :
+                          nameAnimationPhase >= 5 ? 'paramvir' :
+                            nameAnimationPhase >= 4 ? 'PARAMVIR' :
+                              'paramvir'}
+                      </span>
+
+                      {/* Last name - Ramola - animates from beside first name to below */}
+                      {/* Uses dynamic nameOffset for perfect alignment */}
+                      <span
+                        className={`inline-block ${nameAnimationPhase >= 6 ? 'bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent' : ''
+                          }`}
+                        style={{
+                          transform: nameAnimationPhase >= 3
+                            ? 'translateX(0) translateY(0) scale(1)'
+                            : nameAnimationPhase >= 2
+                              ? `translateX(${nameOffset}px) translateY(-100%) scale(1)`
+                              : `translateX(${nameOffset}px) translateY(-100%) scale(0.4)`,
+                          transformOrigin: 'top left',
+                          color: nameAnimationPhase === 2 ? '#ef4444' : // Red
+                            nameAnimationPhase === 3 ? '#ef4444' :
+                              nameAnimationPhase === 4 ? '#22c55e' : // Green
+                                nameAnimationPhase === 5 ? '#3b82f6' : // Blue
+                                  undefined,
+                          transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease-out',
+                        }}
+                      >
+                        {nameAnimationPhase >= 6 ? 'Ramola' :
+                          nameAnimationPhase >= 5 ? 'ramola' :
+                            nameAnimationPhase >= 4 ? 'RAMOLA' :
+                              ' ramola'}
+                      </span>
+                    </div>
+                  </h1>
+                </div>
+
+                {/* Progress bar - Below name */}
+                <div className="h-5 md:h-6 mb-2 md:mb-4">
+                  {!showWelcome && !nameAnimationComplete && (
+                    <div
+                      className={`flex items-center gap-2 md:gap-3 transition-all duration-500 ${nameAnimationPhase >= 7 ? 'opacity-0' : 'opacity-100'
+                        }`}
+                    >
+                      <div className="w-24 md:w-48 h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full transition-all duration-500 ease-out"
+                          style={{ width: `${(nameAnimationPhase / 7) * 100}%` }}
+                        />
+                      </div>
+                      <span className="font-mono text-[10px] md:text-xs text-slate-500 tabular-nums">
+                        {Math.min(100, Math.round((nameAnimationPhase / 7) * 100))}%
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <h2 className={`text-xl md:text-3xl text-cyan-400 font-medium mb-2 md:mb-4 flex items-center gap-2 transition-all duration-500 ease-out ${!showWelcome ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                  Frontend Engineer <Code size={20} className="text-slate-600 md:w-7 md:h-7" />
+                </h2>
+                <div className={`text-slate-400 text-base md:text-xl leading-snug md:leading-relaxed max-w-2xl mb-0 md:mb-4 transition-all duration-500 delay-100 ease-out ${!showWelcome ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                  <p>
+                    Software Engineer with 5+ years of experience building scalable web applications in fintech and e-commerce, specializing in frontend architecture and performance optimization.
+                  </p>
+                </div>
+                {/* Tablet buttons - hidden on mobile (in header) and desktop (in stats row) */}
+                <div className="hidden md:flex lg:hidden flex-wrap gap-4 relative z-10">
                   <button
                     onClick={handleUnlockSequence}
-                    className="px-8 py-3 font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50"
+                    className="px-8 py-3 text-base font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50 hover:scale-105 shadow-lg"
                   >
-                    Contact Me <Mail size={16} />
+                    Contact Me <Mail size={18} />
                   </button>
                   <a
-                    href="#projects"
-                    className="px-8 py-3 bg-slate-900/50 backdrop-blur border border-slate-700 text-white font-bold rounded-full hover:bg-slate-800 transition-colors flex items-center gap-2"
+                    href="https://drive.google.com/file/d/1V1oKf0zFjxxOvCT5tSWDR_CHhHU2l1CI/view?usp=sharing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-8 py-3 text-base bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-full hover:from-cyan-500 hover:to-blue-500 hover:scale-105 transition-all flex items-center gap-2 shadow-lg"
                   >
-                    View Work <ArrowDown size={16} />
+                    Resume <FileText size={18} />
                   </a>
                 </div>
 
-                {/* Compact Stats Row */}
-                <div className="mt-12 pt-8 border-t border-slate-800/50 grid grid-cols-3 gap-6">
-                  <div className="group">
-                    <div className="flex items-center gap-2 mb-2 text-emerald-400">
-                      <TrendingUp size={18} />
-                      <span className="text-xs font-bold font-mono tracking-wider text-emerald-500/80">FINTECH</span>
-                    </div>
-                    <div className="text-sm text-slate-300 font-medium">AngelOne</div>
-                  </div>
-
-                  <div className="group">
-                    <div className="flex items-center gap-2 mb-2 text-pink-400">
-                      <ShoppingBag size={18} />
-                      <span className="text-xs font-bold font-mono tracking-wider text-pink-500/80">ECOMMERCE</span>
-                    </div>
-                    <div className="text-sm text-slate-300 font-medium">Nykaa</div>
-                  </div>
-
-                  <div className="group">
-                    <div className="flex items-center gap-2 mb-2 text-cyan-400">
-                      <Clock size={18} />
-                      <span className="text-xs font-bold font-mono tracking-wider text-cyan-500/80">EXP</span>
-                    </div>
-                    <div className="text-sm text-slate-300 font-medium">5+ Years</div>
-                  </div>
-                </div>
               </div>
 
               {/* 2. Interactive Gap (Right Side) - Empty for physics interaction */}
@@ -386,34 +720,66 @@ export default function Portfolio() {
                     INTERACT WITH FIELD
                   </span>
                 </div>
+              </div>
+            </div>
 
-                {/* Desktop Buttons (Bottom Right) - Aligned to grid */}
-                <div className="absolute bottom-0 right-0 hidden lg:flex gap-4 z-20">
-                  <button
-                    onClick={handleUnlockSequence}
-                    className="px-8 py-3 font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-105"
-                  >
-                    Contact Me <Mail size={16} />
-                  </button>
-                  <a
-                    href="#projects"
-                    className="px-8 py-3 bg-slate-900/80 backdrop-blur border border-slate-700 text-white font-bold rounded-full hover:bg-slate-800 transition-all flex items-center gap-2 hover:scale-105"
-                  >
-                    View Work <ArrowDown size={16} />
-                  </a>
+            {/* Stats and Buttons Row - Full width, outside grid */}
+            <div className="mt-2 md:mt-6 pt-4 md:pt-6 border-t border-slate-800/50 flex items-center justify-between relative z-10 pointer-events-auto">
+              {/* Left - Stats */}
+              <div className="grid grid-cols-3 gap-6 md:gap-14">
+                <div className="group">
+                  <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2 text-emerald-400">
+                    <TrendingUp size={20} className="md:w-6 md:h-6" />
+                    <span className="text-xs md:text-base font-bold font-mono tracking-wider text-emerald-500/80">FINTECH</span>
+                  </div>
+                  <div className="text-base md:text-lg text-slate-300 font-medium">AngelOne</div>
                 </div>
+
+                <div className="group">
+                  <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2 text-pink-400">
+                    <ShoppingBag size={20} className="md:w-6 md:h-6" />
+                    <span className="text-xs md:text-base font-bold font-mono tracking-wider text-pink-500/80">ECOMMERCE</span>
+                  </div>
+                  <div className="text-base md:text-lg text-slate-300 font-medium">Nykaa</div>
+                </div>
+
+                <div className="group">
+                  <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2 text-cyan-400">
+                    <Clock size={20} className="md:w-6 md:h-6" />
+                    <span className="text-xs md:text-base font-bold font-mono tracking-wider text-cyan-500/80">EXP</span>
+                  </div>
+                  <div className="text-base md:text-lg text-slate-300 font-medium">5+ Years</div>
+                </div>
+              </div>
+
+              {/* Right - Buttons */}
+              <div className="hidden lg:flex gap-4 shrink-0">
+                <button
+                  onClick={handleUnlockSequence}
+                  className="px-8 py-3 text-base font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50 hover:scale-105 whitespace-nowrap shadow-lg"
+                >
+                  Contact Me <Mail size={18} />
+                </button>
+                <a
+                  href="https://drive.google.com/file/d/1V1oKf0zFjxxOvCT5tSWDR_CHhHU2l1CI/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-3 text-base bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-full hover:from-cyan-500 hover:to-blue-500 hover:scale-105 transition-all flex items-center gap-2 whitespace-nowrap shadow-lg"
+                >
+                  Resume <FileText size={18} />
+                </a>
               </div>
             </div>
           </section>
 
           {/* FEATURE SECTION: Featured Projects */}
           <section id="projects" className="mb-32 relative scroll-mt-24">
-            <div className="flex items-end justify-between mb-12">
+            <div className="flex items-end justify-between mb-12 md:mb-16">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
                   Featured Projects
                 </h2>
-                <p className="text-slate-400">
+                <p className="text-slate-400 text-base md:text-xl">
                   Innovations and tools built for scale.
                 </p>
               </div>
@@ -421,7 +787,7 @@ export default function Portfolio() {
 
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-900/10 to-blue-900/10 rounded-3xl blur-3xl -z-10"></div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
               {PROJECTS.map((project) => (
                 <ProjectCard
                   key={project.id}
@@ -442,19 +808,22 @@ export default function Portfolio() {
 
           {/* Engineering Section */}
           <section id="engineering" className="mb-32 scroll-mt-24">
-            <div className="flex items-end justify-between mb-12">
+            <div className="flex items-end justify-between mb-12 md:mb-16">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
                   Engineering Deep Dives
                 </h2>
-                <p className="text-slate-400">
+                <p className="text-slate-400 text-base md:text-xl">
                   Beyond the UI: Infrastructure, Security, and Scale.
                 </p>
               </div>
             </div>
 
             {/* Responsive Grid / Carousel */}
-            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible md:pb-0 no-scrollbar">
+            <div
+              ref={engineeringCarouselRef}
+              className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-8 pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible md:pb-0 no-scrollbar"
+            >
               <VisualCard
                 title="Performance"
                 icon={Zap}
@@ -519,15 +888,22 @@ export default function Portfolio() {
                   <p className="text-slate-400 text-sm leading-relaxed">
                     Advanced optimization and architectural migrations.
                   </p>
-                  <div className="bg-slate-950/50 p-4 rounded-lg border border-slate-800">
-                    <ProgressBar
-                      label="Nykaa CDN Cache Size"
-                      before={1.6}
-                      after={1.0}
-                      max={1.6}
-                      unit="TB"
-                      colorClass="text-blue-400"
-                    />
+                  <div className="bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs text-slate-400 font-mono">
+                        ImageKit Cache Usage
+                      </span>
+                      <span className="text-xs text-blue-400 font-bold">
+                        -63%
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-blue-500 h-full w-[63%]"></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-500 mt-1.5 font-mono">
+                      <span className="text-blue-400">Now: 600 MB</span>
+                      <span>Was: 1.6 TB</span>
+                    </div>
                   </div>
                 </div>
               </VisualCard>
@@ -649,16 +1025,31 @@ export default function Portfolio() {
                 </div>
               </VisualCard>
             </div>
+
+            {/* Carousel Dots (Mobile Only) */}
+            <div className="flex justify-center gap-2 mt-4 md:hidden">
+              {Array.from({ length: engineeringCardCount }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => scrollToSlide(idx)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${engineeringSlide === idx
+                    ? 'bg-cyan-400 w-6'
+                    : 'bg-slate-600 hover:bg-slate-500'
+                    }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </section>
 
           {/* NEW SECTION: Tech Stack */}
           <section id="stack" className="mb-32 scroll-mt-24">
-            <div className="flex items-end justify-between mb-8">
+            <div className="flex items-end justify-between mb-8 md:mb-12">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
                   My Tech Stack
                 </h2>
-                <p className="text-slate-400">
+                <p className="text-slate-400 text-base md:text-xl">
                   The tools I use to build systems.
                 </p>
               </div>
@@ -674,13 +1065,13 @@ export default function Portfolio() {
           {/* Experience Section */}
           <section
             id="work"
-            className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-24 scroll-mt-24"
+            className="grid grid-cols-1 lg:grid-cols-3 gap-12 md:gap-16 mb-24 md:mb-32 scroll-mt-24"
           >
             <div className="lg:col-span-1">
-              <h2 className="text-3xl font-bold text-white mb-6 sticky top-24">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 sticky top-24">
                 Career <br />
                 Timeline
-                <p className="text-sm font-normal text-slate-500 mt-4 font-mono">
+                <p className="text-sm md:text-lg font-normal text-slate-500 mt-4 md:mt-6 font-mono">
                   5+ Years of Experience building scalable frontend systems.
                 </p>
               </h2>
@@ -752,16 +1143,19 @@ export default function Portfolio() {
 
           {/* New Technical Writing Section */}
           <section id="articles" className="mb-32 scroll-mt-24">
-            <div className="flex items-end justify-between mb-12">
+            <div className="flex items-end justify-between mb-12 md:mb-16">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
                   Technical Writing
                 </h2>
-                <p className="text-slate-400">Sharing knowledge on Medium.</p>
+                <p className="text-slate-400 text-base md:text-xl">Sharing knowledge on Medium.</p>
               </div>
             </div>
 
-            <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-4 md:grid md:grid-cols-2 md:overflow-visible md:pb-0 no-scrollbar">
+            <div
+              ref={articlesCarouselRef}
+              className="flex overflow-x-auto snap-x snap-mandatory gap-6 md:gap-8 pb-4 md:grid md:grid-cols-2 md:overflow-visible md:pb-0 no-scrollbar"
+            >
               <ArticleCard
                 title="Transform Your Web Pages Instantly with Matcha.css"
                 link="https://medium.com/p/fc2faa041574"
@@ -778,10 +1172,25 @@ export default function Portfolio() {
                 icon={Shield}
               />
               <ArticleCard
-                title="Stop Using Just 10% of DevTools — Here’s What You’re Missing"
+                title="Stop Using Just 10% of DevTools — Here's What You're Missing"
                 link="https://medium.com/p/5bba9725da47"
                 icon={MonitorPlay}
               />
+            </div>
+
+            {/* Carousel Dots (Mobile Only) */}
+            <div className="flex justify-center gap-2 mt-4 md:hidden">
+              {Array.from({ length: articlesCardCount }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => scrollToArticleSlide(idx)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${articlesSlide === idx
+                    ? 'bg-cyan-400 w-6'
+                    : 'bg-slate-600 hover:bg-slate-500'
+                    }`}
+                  aria-label={`Go to article ${idx + 1}`}
+                />
+              ))}
             </div>
           </section>
 
@@ -789,6 +1198,7 @@ export default function Portfolio() {
           <FooterSection
             triggerUnlock={wasUnlockedViaButton}
             onLockedClick={() => handleLockedInteraction("Access Denied! Use the 'Contact Me' button.")}
+            forceOpen={!isFooterLocked}
           />
         </main>
       </div>

@@ -41,30 +41,55 @@ export const SKILLS = [
 const GLOBE_RADIUS = 120;
 const PERSPECTIVE = 800;
 
-export const calculatePosition = (index, groupIndex, skills, rotation) => {
+export const calculatePosition = (index, groupIndex, skills, rotation, isMobile = false) => {
   // 1. Globe State (Fibonacci Sphere with Rotation)
   const phi = Math.acos(-1 + (2 * index) / skills.length);
-  const theta = Math.sqrt(skills.length * Math.PI) * phi + rotation; // Add rotation to theta
+  const theta = Math.sqrt(skills.length * Math.PI) * phi + rotation;
 
-  // 3D Coordinates (Rotating Y-Axis)
-  const x3D = GLOBE_RADIUS * Math.cos(theta) * Math.sin(phi);
-  const y3D = GLOBE_RADIUS * Math.sin(theta) * Math.sin(phi);
-  const z3D = GLOBE_RADIUS * Math.cos(phi);
+  const globeRadius = isMobile ? 90 : 120; // Smaller globe on mobile
+  const x3D = globeRadius * Math.cos(theta) * Math.sin(phi);
+  const y3D = globeRadius * Math.sin(theta) * Math.sin(phi);
+  const z3D = globeRadius * Math.cos(phi);
 
-  // Project 3D to 2D
   const scaleGlobe = PERSPECTIVE / (PERSPECTIVE + z3D);
   const xGlobe = x3D * scaleGlobe;
   const yGlobe = y3D * scaleGlobe;
   const zIndexGlobe = Math.floor(scaleGlobe * 100);
 
-  // 2. Grid State (Spread Flat)
-  const colWidth = 180;
-  const xGrid = (groupIndex - 1.5) * colWidth + (groupIndex > 1 ? 40 : -40);
-  const groupItems = skills.filter((s) => s.group === groupIndex);
-  const itemIndexInGroup = groupItems.findIndex(
-    (s) => s.name === skills[index].name
-  );
-  const yGrid = -160 + itemIndexInGroup * 50;
+  // 2. Grid State
+  let xGrid, yGrid;
+
+  if (isMobile) {
+    // Mobile: 2-column grid layout with proper spacing
+    const mobileRowHeight = 52; // Increased row height for better spacing
+    const columnSpacing = 85; // Horizontal spacing between columns
+    
+    // Calculate total rows needed for all items above current group
+    let totalRowsAbove = 0;
+    for (let g = 0; g < groupIndex; g++) {
+      const groupCount = skills.filter((s) => s.group === g).length;
+      totalRowsAbove += Math.ceil(groupCount / 2);
+    }
+    
+    const groupItems = skills.filter((s) => s.group === groupIndex);
+    const itemIndexInGroup = groupItems.findIndex((s) => s.name === skills[index].name);
+    
+    // 2-column zigzag: left column (-columnSpacing), right column (+columnSpacing)
+    xGrid = itemIndexInGroup % 2 === 0 ? -columnSpacing : columnSpacing;
+    
+    // Calculate Y position: start from top, add rows from previous groups + current row
+    const startY = -180; // Starting Y position
+    const currentRow = Math.floor(itemIndexInGroup / 2);
+    yGrid = startY + (totalRowsAbove + currentRow) * mobileRowHeight;
+    
+  } else {
+    // Desktop: Horizontal Spread
+    const colWidth = 180;
+    xGrid = (groupIndex - 1.5) * colWidth + (groupIndex > 1 ? 40 : -40);
+    const groupItems = skills.filter((s) => s.group === groupIndex);
+    const itemIndexInGroup = groupItems.findIndex((s) => s.name === skills[index].name);
+    yGrid = -160 + itemIndexInGroup * 50;
+  }
 
   return { xGlobe, yGlobe, xGrid, yGrid, scaleGlobe, zIndexGlobe };
 };
