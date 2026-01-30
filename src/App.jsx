@@ -228,15 +228,15 @@ export default function Portfolio() {
           // Phase 2: Scale up & Slide down + RED
           { delay: 200, phase: 2, style: 'font-size: 5rem; color: #ef4444' },
           // Phase 3: Display block
-          { delay: 800, phase: 3, style: 'display: block' },
+          { delay: 1000, phase: 3, style: 'display: block' },
           // Phase 4: UPPERCASE + GREEN
-          { delay: 1400, phase: 4, style: 'text-transform: UPPERCASE; color: #22c55e' },
+          { delay: 1800, phase: 4, style: 'text-transform: UPPERCASE; color: #22c55e' },
           // Phase 5: lowercase + BLUE
-          { delay: 1700, phase: 5, style: 'text-transform: lowercase; color: #3b82f6' },
+          { delay: 2600, phase: 5, style: 'text-transform: lowercase; color: #3b82f6' },
           // Phase 6: Capitalize + CYAN GRADIENT
-          { delay: 2000, phase: 6, style: 'text-transform: capitalize; color: cyan-gradient' },
+          { delay: 3400, phase: 6, style: 'text-transform: capitalize; color: cyan-gradient' },
           // Phase 7: Complete
-          { delay: 2800, phase: 7, style: '✓ complete' },
+          { delay: 4400, phase: 7, style: '✓ complete' },
         ];
 
         phases.forEach(({ delay, phase, style }) => {
