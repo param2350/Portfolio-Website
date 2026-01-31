@@ -131,6 +131,7 @@ export default function Portfolio() {
   const nameAnimationStarted = useRef(false);
 
 
+
   // Ref for measuring first name width for perfect alignment
   const paramvirRef = useRef(null);
   const [nameOffset, setNameOffset] = useState(0);
@@ -487,10 +488,10 @@ export default function Portfolio() {
 
           <div className="flex items-center gap-2 md:gap-6">
             {/* Mobile Header Buttons */}
-            <div className="flex md:hidden items-center gap-2">
+            <div className="flex md:hidden items-center gap-2 transition-all duration-300">
               <button
                 onClick={handleUnlockSequence}
-                className="px-4 py-2 font-bold rounded-full transition-all flex items-center gap-1.5 bg-white text-slate-950 text-sm"
+                className="px-4 py-2 font-bold rounded-full transition-all flex items-center gap-1.5 text-sm bg-white text-slate-950"
               >
                 Contact <Mail size={14} />
               </button>
@@ -694,10 +695,10 @@ export default function Portfolio() {
                   </p>
                 </div>
                 {/* Tablet buttons - hidden on mobile (in header) and desktop (in stats row) */}
-                <div className="hidden md:flex lg:hidden flex-wrap gap-4 relative z-10">
+                <div className="hidden md:flex lg:hidden flex-wrap gap-4 relative z-10 transition-all duration-300">
                   <button
                     onClick={handleUnlockSequence}
-                    className="px-8 py-3 text-base font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50 hover:scale-105 shadow-lg"
+                    className="px-8 py-3 text-base font-bold rounded-full transition-all flex items-center gap-2 shadow-lg bg-white text-slate-950 hover:bg-cyan-50 hover:scale-105"
                   >
                     Contact Me <Mail size={18} />
                   </button>
@@ -753,10 +754,10 @@ export default function Portfolio() {
               </div>
 
               {/* Right - Buttons */}
-              <div className="hidden lg:flex gap-4 shrink-0">
+              <div className="hidden lg:flex gap-4 shrink-0 transition-all duration-300">
                 <button
                   onClick={handleUnlockSequence}
-                  className="px-8 py-3 text-base font-bold rounded-full transition-all flex items-center gap-2 bg-white text-slate-950 hover:bg-cyan-50 hover:scale-105 whitespace-nowrap shadow-lg"
+                  className="px-8 py-3 text-base font-bold rounded-full transition-all flex items-center gap-2 whitespace-nowrap shadow-lg bg-white text-slate-950 hover:bg-cyan-50 hover:scale-105"
                 >
                   Contact Me <Mail size={18} />
                 </button>
@@ -971,10 +972,6 @@ export default function Portfolio() {
                       {
                         title: 'PII Data Protection',
                         desc: 'Log sanitization & masking',
-                      },
-                      {
-                        title: 'Production Hardening',
-                        desc: 'Disabled source maps in prod',
                       },
                     ]}
                   />

@@ -298,9 +298,9 @@ const WelcomeScreen = ({ onComplete }) => {
 
                 {/* Label */}
                 {!isUnveiling && pullProgress < 0.1 && (
-                    <div className="absolute right-full top-1/2 -translate-y-1/2 mr-6 w-48 bg-white/10 backdrop-blur border border-white/20 text-white text-xs p-2 rounded-lg text-right animate-pulse select-none pointer-events-none flex items-center justify-end gap-2">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-6 flex flex-col items-center gap-2 text-cyan-400 font-mono text-xs font-bold tracking-[0.3em] animate-pulse select-none pointer-events-none drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
                         <span className="whitespace-nowrap">DRAG ME DOWN</span>
-                        <ArrowDown className="w-3 h-3" />
+                        <ArrowDown className="w-4 h-4" />
                     </div>
                 )}
             </div>

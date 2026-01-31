@@ -1,10 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { Lock, Mail, Github, Linkedin } from 'lucide-react';
+import { Lock, Mail, Github, Linkedin, CheckCircle, Copy } from 'lucide-react';
 
 // --- Footer Contact Section - Locked until Contact Me is clicked ---
 const FooterSection = ({ triggerUnlock, onLockedClick, forceOpen = false }) => {
   const [phase, setPhase] = useState(forceOpen ? 'revealed' : 'locked'); // locked -> unlocking -> revealed
+  const [emailCopied, setEmailCopied] = useState(false);
   const footerRef = useRef(null);
+
+  const handleEmailClick = (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText('ramolaparamvir99@gmail.com');
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000);
+  };
 
   // Trigger unlock animation ONLY when button is clicked
   useEffect(() => {
@@ -105,48 +113,60 @@ const FooterSection = ({ triggerUnlock, onLockedClick, forceOpen = false }) => {
 
         {/* Contact links */}
         <div
-          className={`flex flex-wrap justify-center gap-8 md:gap-12 mb-16 transition-all duration-700 ${isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className={`flex flex-col items-center gap-8 md:gap-12 mb-16 transition-all duration-700 ${isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
           style={{ transitionDelay: isRevealed ? '400ms' : '0ms' }}
         >
-          <a
-            href="https://github.com/param2350"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center gap-4 group"
-          >
-            <div className="w-20 h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 group-hover:scale-110 group-hover:border-cyan-500/50 group-hover:text-cyan-400 group-hover:bg-slate-800 transition-all duration-300 backdrop-blur-sm">
-              <Github size={32} />
-            </div>
-            <span className="text-xs font-medium text-slate-500 group-hover:text-white transition-colors">
-              GitHub
-            </span>
-          </a>
+          {/* Social Row */}
+          <div className="flex items-center justify-center gap-8 md:gap-12">
+            <a
+              href="https://github.com/param2350"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-4 group"
+            >
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 group-hover:scale-110 group-hover:border-cyan-500/50 group-hover:text-cyan-400 group-hover:bg-slate-800 transition-all duration-300 backdrop-blur-sm shadow-lg">
+                <Github size={28} className="md:w-8 md:h-8" />
+              </div>
+              <span className="text-xs font-medium text-slate-500 group-hover:text-white transition-colors">
+                GitHub
+              </span>
+            </a>
 
-          <a
-            href="https://www.linkedin.com/in/paramvir-ramola/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center gap-4 group"
-          >
-            <div className="w-20 h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 group-hover:scale-110 group-hover:border-blue-500/50 group-hover:text-blue-400 group-hover:bg-slate-800 transition-all duration-300 backdrop-blur-sm">
-              <Linkedin size={32} />
-            </div>
-            <span className="text-xs font-medium text-slate-500 group-hover:text-white transition-colors">
-              LinkedIn
-            </span>
-          </a>
+            <a
+              href="https://www.linkedin.com/in/paramvir-ramola/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-4 group"
+            >
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 group-hover:scale-110 group-hover:border-blue-500/50 group-hover:text-blue-400 group-hover:bg-slate-800 transition-all duration-300 backdrop-blur-sm shadow-lg">
+                <Linkedin size={28} className="md:w-8 md:h-8" />
+              </div>
+              <span className="text-xs font-medium text-slate-500 group-hover:text-white transition-colors">
+                LinkedIn
+              </span>
+            </a>
+          </div>
 
-          <a
-            href="mailto:ramolaparamvir99@gmail.com"
-            className="flex flex-col items-center gap-4 group"
+          {/* Email Display & Copy Button */}
+          <button
+            onClick={handleEmailClick}
+            className="group relative flex items-center gap-3 md:gap-4 px-6 md:px-8 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl hover:bg-slate-800 hover:border-purple-500/50 transition-all duration-300 shadow-lg hover:shadow-purple-500/10 active:scale-95 w-full max-w-sm md:max-w-md justify-center"
+            title="Click to Copy"
           >
-            <div className="w-20 h-20 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 group-hover:scale-110 group-hover:border-purple-500/50 group-hover:text-purple-400 group-hover:bg-slate-800 transition-all duration-300 backdrop-blur-sm">
-              <Mail size={32} />
+            <div className={`p-2 rounded-full ${emailCopied ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-400 group-hover:text-purple-400'} transition-colors`}>
+              {emailCopied ? <CheckCircle size={20} /> : <Mail size={20} />}
             </div>
-            <span className="text-xs font-medium text-slate-500 group-hover:text-white transition-colors">
-              Email
+
+            <span className={`text-sm md:text-lg font-mono tracking-wide ${emailCopied ? 'text-green-400' : 'text-slate-300 group-hover:text-white'} transition-colors`}>
+              {emailCopied ? 'Copied to clipboard!' : 'ramolaparamvir99@gmail.com'}
             </span>
-          </a>
+
+            {!emailCopied && (
+              <div className="absolute right-4 text-slate-600 group-hover:text-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <Copy size={16} />
+              </div>
+            )}
+          </button>
         </div>
 
         {/* Divider that expands from center */}
