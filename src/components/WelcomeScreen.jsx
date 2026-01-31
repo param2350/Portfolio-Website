@@ -296,8 +296,8 @@ const WelcomeScreen = ({ onComplete }) => {
                     </div>
                 </div>
 
-                {/* Label */}
-                {!isUnveiling && pullProgress < 0.1 && (
+                {/* Label - Visibility threshold relaxed for mobile physics sag */}
+                {!isUnveiling && pullProgress < 0.45 && (
                     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-6 flex flex-col items-center gap-2 text-cyan-400 font-mono text-xs font-bold tracking-[0.3em] animate-pulse select-none pointer-events-none drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
                         <span className="whitespace-nowrap">DRAG ME DOWN</span>
                         <ArrowDown className="w-4 h-4" />
