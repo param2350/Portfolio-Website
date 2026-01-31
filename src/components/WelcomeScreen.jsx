@@ -13,9 +13,9 @@ const WelcomeScreen = ({ onComplete }) => {
     const physicsRef = useRef({
         rope: [],
         config: {
-            gravity: 10, // Slightly stronger gravity for weight feel
-            elasticK: 0.04, // Lower spring constant = more stretch
-            slowK: 0.99, // Less damping = more lasting bounce
+            gravity: 20, // Stronger gravity for weight feel
+            elasticK: 0.2, // Higher spring constant = stiffer rope (less rubber band)
+            slowK: 0.98, // Damping (keep some swing but kill oscillation)
             timeInterval: 1 / 1000,
             unitLength: 0,
             segments: 20,
@@ -78,14 +78,19 @@ const WelcomeScreen = ({ onComplete }) => {
             const { rope, config } = physicsRef.current;
             const { gravity, elasticK, slowK, timeInterval, unitLength } = config;
 
-            // Run multiple substeps for stability
-            for (let step = 0; step < 10; step++) {
+            // Run multiple substeps for stability and stiffness
+            for (let step = 0; step < 40; step++) {
                 // 1. Forces & Verlet Integration
                 for (let i = 1; i < rope.length; i++) {
                     let p = rope[i];
 
                     // Gravity
                     p.vy += gravity * timeInterval;
+
+                    // Extra gravity for the head (last node) to simulate weight
+                    if (i === rope.length - 1) {
+                        p.vy += gravity * 2 * timeInterval;
+                    }
 
                     // Spring Forces (Constraint to previous node)
                     const prev = rope[i - 1]; // Current Live Ref

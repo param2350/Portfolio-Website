@@ -43,13 +43,30 @@ const PERSPECTIVE = 800;
 
 export const calculatePosition = (index, groupIndex, skills, rotation, isMobile = false) => {
   // 1. Globe State (Fibonacci Sphere with Rotation)
+  // 1. Globe State (Fibonacci Sphere with Rotation)
+  // Calculate static position on sphere
   const phi = Math.acos(-1 + (2 * index) / skills.length);
-  const theta = Math.sqrt(skills.length * Math.PI) * phi + rotation;
+  const theta = Math.sqrt(skills.length * Math.PI) * phi;
 
-  const globeRadius = isMobile ? 90 : 120; // Smaller globe on mobile
-  const x3D = globeRadius * Math.cos(theta) * Math.sin(phi);
-  const y3D = globeRadius * Math.sin(theta) * Math.sin(phi);
-  const z3D = globeRadius * Math.cos(phi);
+  const globeRadius = isMobile ? 90 : 120;
+  
+  // Base coordinates (Static Sphere)
+  const x0 = globeRadius * Math.cos(theta) * Math.sin(phi);
+  const y0 = globeRadius * Math.sin(theta) * Math.sin(phi);
+  const z0 = globeRadius * Math.cos(phi);
+
+  // Apply Rotation (Rotate around Y-axis for horizontal spin)
+  // x' = x*cos(r) - z*sin(r)
+  // z' = x*sin(r) + z*cos(r)
+  // y' = y
+  
+  // Add a slight tilt (Rotate X slightly?) - Optional, let's keep it simple first
+  // Actually, mixing X and Y rotation looks better.
+  // Let's do a simple Y-axis spin first as requested.
+  
+  const x3D = x0 * Math.cos(rotation) - z0 * Math.sin(rotation);
+  const y3D = y0; 
+  const z3D = x0 * Math.sin(rotation) + z0 * Math.cos(rotation);
 
   const scaleGlobe = PERSPECTIVE / (PERSPECTIVE + z3D);
   const xGlobe = x3D * scaleGlobe;
